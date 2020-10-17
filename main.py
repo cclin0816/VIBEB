@@ -24,6 +24,7 @@ def main():
     print("Running HitPoint")
     print("Running VIBE")
     vibe = VIBE()
+    vibe.run()
 
 if __name__ == '__main__':
     main()
