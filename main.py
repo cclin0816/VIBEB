@@ -15,7 +15,7 @@ def main():
     pbar = tqdm.tqdm(total=fr.vid_len, file=sys.stdout)
     while not islast:
         islast, data = fr.read(read_length=12, output_size=(512, 288))
-        tn.run(data, 1)
+        tn.run(data, 4)
         pbar.update(data.shape[0])
     pbar.close()
     print("Running Smoothing")
