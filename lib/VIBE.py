@@ -1,6 +1,7 @@
 import torch
 from multi_person_tracker import MPT
 from multi_person_tracker.data import video_to_images
+import os
 
 class VIBE():
 
@@ -9,8 +10,8 @@ class VIBE():
             'cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     def run(self):
-        image_folder, num_frames, img_shape = video_to_images('data/video/1_01_00.mp4', 'out', return_info=True)
+        image_folder, num_frames, img_shape = video_to_images('data/video/1_01_00.mp4', 'data/frame', return_info=True)
         orig_height, orig_width = img_shape[:2]
-        mot = MPT(device=self.device)
-        tracking_results = mot(image_folder, output_file='sample_output.mp4')
+        mot = MPT(device=self.device, display=True)
+        tracking_results = mot(image_folder, output_file='data/output.mp4')
         print(tracking_results)
