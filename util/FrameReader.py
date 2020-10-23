@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 import sys
+import os
+import tqdm
 
 
 class FR:
@@ -11,7 +13,7 @@ class FR:
             sys.exit('Error Opening File')
         self.vid_len = int(self.__vid.get(cv2.CAP_PROP_FRAME_COUNT))
 
-    # return tuple( is last (bool), frame data (np array of fc * 3 * w * h) )
+    # return tuple( is last (bool), frame data (np array of fc * 3(RGB) * w * h) )
     def read(self, frame_number=-1, read_length=1, output_size=()):
         if frame_number != -1:
             if frame_number < 0 or frame_number >= self.vid_len:
@@ -43,6 +45,20 @@ class FR:
 
     def rewind(self):
         self.__vid.set(cv2.CAP_PROP_POS_FRAMES, 0.0)
+
+    def decode(self, output_dir='data/frame/'):
+        print(f'Extracting Image to {output_dir}')
+        self.rewind()
+        if not os.path.isdir(output_dir):
+            os.makedirs(output_dir)
+        for i in range(self.vid_len):
+            sucess, frame = self.__vid.read()
+            if not sucess:
+                if not self.__end_read():
+                    sys.exit(
+                        f'Error Reading Frame {self.__vid.get(cv2.CAP_PROP_POS_FRAMES)} / {self.vid_len}')
+            cv2.imwrite(os.path.join(output_dir, f'{i:06d}.png'), frame)
+        return self.vid_len, (int(self.__vid.get(cv2.CAP_PROP_FRAME_WIDTH)), int(self.__vid.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 
     def __end_read(self):
         return self.__vid.get(cv2.CAP_PROP_POS_FRAMES) == self.vid_len

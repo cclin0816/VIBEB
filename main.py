@@ -25,27 +25,33 @@ def Run_HitPoint(pipe, traj):
     print("Running HitPoint")
     pipe.send([])
 
-def Run_VIBE(pipe, hp):
+def Run_VIBE(pipe, hp, vid_path):
     print("Running VIBE")
+    # fr = FR(vid_path)
+    # fr.decode()
     vibe = VIBE()
-    vibe.run()
+    vibe.run(vid_path, 'data/frame/')
 
 def main():
     print("Initiaizing...")
 
+    vid_path = 'data/video/1_01_00.mp4'
+
     pipe_p, pipe_c = Pipe()
 
-    p = Process(target=Run_TrackNet, args=(pipe_c, 'data/video/1_01_00.mp4',))
-    p.start()
-    traj = pipe_p.recv()
-    p.join()
+    # p = Process(target=Run_TrackNet, args=(pipe_c, vid_path,))
+    # p.start()
+    # traj = pipe_p.recv()
+    # p.join()
 
-    p = Process(target=Run_HitPoint, args=(pipe_c, traj,))
-    p.start()
-    hp = pipe_p.recv()
-    p.join()
+    # p = Process(target=Run_HitPoint, args=(pipe_c, traj,))
+    # p.start()
+    # hp = pipe_p.recv()
+    # p.join()
 
-    p = Process(target=Run_VIBE, args=(pipe_c, hp,))
+    hp = []
+
+    p = Process(target=Run_VIBE, args=(pipe_c, hp, vid_path,))
     p.start()
     p.join()
 
