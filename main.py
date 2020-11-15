@@ -27,10 +27,7 @@ def Run_HitPoint(pipe, traj):
 
 def Run_VIBE(pipe, hp, vid_path):
     print("Running VIBE")
-    # fr = FR(vid_path)
-    # fr.decode()
-    vibe = VIBE()
-    vibe.run(vid_path, 'data/frame/')
+    VIBE(vid_path)
 
 def main():
     print("Initiaizing...")

@@ -3,6 +3,7 @@ import numpy as np
 import sys
 import os
 import tqdm
+import shutil
 
 
 class FR:
@@ -51,6 +52,9 @@ class FR:
         self.rewind()
         if not os.path.isdir(output_dir):
             os.makedirs(output_dir)
+        else:
+            shutil.rmtree(output_dir)
+            os.makedirs(output_dir)
         for i in range(self.vid_len):
             sucess, frame = self.__vid.read()
             if not sucess:
@@ -58,7 +62,7 @@ class FR:
                     sys.exit(
                         f'Error Reading Frame {self.__vid.get(cv2.CAP_PROP_POS_FRAMES)} / {self.vid_len}')
             cv2.imwrite(os.path.join(output_dir, f'{i:06d}.png'), frame)
-        return self.vid_len, (int(self.__vid.get(cv2.CAP_PROP_FRAME_WIDTH)), int(self.__vid.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+        return self.vid_len, int(self.__vid.get(cv2.CAP_PROP_FRAME_WIDTH)), int(self.__vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     def __end_read(self):
         return self.__vid.get(cv2.CAP_PROP_POS_FRAMES) == self.vid_len
@@ -66,3 +70,6 @@ class FR:
     def __del__(self):
         if self.__vid.isOpened():
             self.__vid.release()
+
+    def read_frame(self):
+        return self.__vid.read()
