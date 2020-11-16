@@ -2,6 +2,8 @@ import numpy as np
 from util.FrameReader import FR
 from lib.TrackNet import TrackNet
 from lib.VIBE import VIBE
+from lib.Render import Render
+from lib.HitPoint import HitPoint
 import tqdm
 import sys
 from multiprocessing import Process, Pipe
@@ -23,11 +25,18 @@ def Run_TrackNet(pipe, vid_path):
 
 def Run_HitPoint(pipe, traj):
     print("Running HitPoint")
-    pipe.send([])
+    hp = HitPoint(traj)
+    pipe.send(hp)
 
-def Run_VIBE(pipe, hp, vid_path):
+def Run_VIBE(pipe, vid_path):
     print("Running VIBE")
-    VIBE(vid_path)
+    vibe_result = VIBE(vid_path)
+    pipe.send(vibe_result)
+
+def Run_Render(pipe, hp, vibe_result):
+    print("Running Render")
+    Render(hp, vibe_result)
+
 
 def main():
     print("Initiaizing...")
@@ -36,21 +45,27 @@ def main():
 
     pipe_p, pipe_c = Pipe()
 
-    # p = Process(target=Run_TrackNet, args=(pipe_c, vid_path,))
-    # p.start()
-    # traj = pipe_p.recv()
-    # p.join()
-
-    # p = Process(target=Run_HitPoint, args=(pipe_c, traj,))
-    # p.start()
-    # hp = pipe_p.recv()
-    # p.join()
-
-    hp = []
-
-    p = Process(target=Run_VIBE, args=(pipe_c, hp, vid_path,))
+    p = Process(target=Run_TrackNet, args=(pipe_c, vid_path,))
     p.start()
+    traj = pipe_p.recv()
     p.join()
+
+    p = Process(target=Run_HitPoint, args=(pipe_c, traj,))
+    p.start()
+    hp = pipe_p.recv()
+    p.join()
+
+    p = Process(target=Run_VIBE, args=(pipe_c, vid_path,))
+    p.start()
+    vibe_result = pipe_p.recv()
+    p.join()
+
+    p = Process(target=Run_Render, args=(pipe_c, hp, vibe_result,))
+    p.start()
+    # vibe_result = pipe_p.recv()
+    p.join()
+
+
 
 if __name__ == '__main__':
     main()
