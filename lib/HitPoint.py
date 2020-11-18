@@ -122,7 +122,7 @@ def classify(feature):
             hp.append(itr)
         itr += 1
         # else:
-            # pred.append(1)
+        # pred.append(1)
     # ball_type = np.reshape(pred, (-1, 1))
     # return ball_type
     return hp
@@ -132,6 +132,7 @@ def get_dist(a, b):
     dx = a[0] - b[0]
     dy = a[1] - b[1]
     return math.sqrt(dx * dx + dy * dy)
+
 
 def polyfit(front, back, size, deg):
     fit = np.zeros(size)
@@ -144,6 +145,7 @@ def polyfit(front, back, size, deg):
     for i in range(size):
         fit[i] = p(3 + i)
     return fit
+
 
 def smoothing(traj):
     stable = []
@@ -212,8 +214,10 @@ def smoothing(traj):
                 deg = 3
             else:
                 deg = 1
-            traj[front:back, 1] = polyfit(traj[front - 3: front, 1], traj[back:back + 3, 1], size, deg)
-            traj[front:back, 2] = polyfit(traj[front - 3: front, 2], traj[back:back + 3, 2], size, deg)
+            traj[front:back, 1] = polyfit(
+                traj[front - 3: front, 1], traj[back:back + 3, 1], size, deg)
+            traj[front:back, 2] = polyfit(
+                traj[front - 3: front, 2], traj[back:back + 3, 2], size, deg)
         elif stable[i] == 0 and stable[i - 1] == 1:
             front = i
         i += 1
@@ -221,23 +225,8 @@ def smoothing(traj):
     return traj
 
 
-# def classify_ball_type(traj):
-    # print("smoothing ...")
-    # traj = smoothing(traj)
-    # print("extracting feature ...")
-    # feature = extract_feature(traj[:, 1:])
-    # print("detecting HitPoint ...")
-    # ball_type = classify(feature)
-    # hp = classify(feature)
-    # ball_type = np.concatenate((ball_type, traj[:, 1:]), axis=1)
-    # print(ball_type.shape)
-    # return ball_type
-    # return hp
-
-
-
 def HitPoint(traj):
     traj = smoothing(traj)
     feature = extract_feature(traj[:, 1:])
     hp = classify(feature)
-    return hp
+    return hp, traj[:, 1:]

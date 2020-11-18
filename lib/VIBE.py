@@ -19,10 +19,12 @@ def get_dist(a, b):
     dy = a[1] - b[1]
     return math.sqrt(dx * dx + dy * dy)
 
+
 def get_speed(a, b):
     dx = a[0] + b[0]
     dy = a[1] + b[1]
     return math.sqrt(dx * dx + dy * dy)
+
 
 def filter_player(tracking_results, num_frames):
     stick = []
@@ -53,8 +55,8 @@ def filter_player(tracking_results, num_frames):
         while j < len(stick):
             if((stick[j]['first']['frame'] > stick[i]['last']['frame']) and
                 stick[j]['first']['frame'] - stick[i]['last']['frame'] < 20 and
-                    get_dist(stick[j]['first']['center'], stick[i]['last']['center']) < 70 + \
-                         get_speed(stick[j]['first']['speed'], stick[i]['last']['speed']) * 3):
+                    get_dist(stick[j]['first']['center'], stick[i]['last']['center']) < 70 +
+               get_speed(stick[j]['first']['speed'], stick[i]['last']['speed']) * 3):
                 stick_record[stick[i]['id']].append(stick[j]['id'])
                 stick[i]['last']['frame'] = stick[j]['last']['frame']
                 stick[i]['last']['center'] = stick[j]['last']['center']
@@ -69,7 +71,7 @@ def filter_player(tracking_results, num_frames):
             stick.pop(i)
         else:
             i += 1
-    
+
     my_track = {}
     travel_distance = []
     for st in stick:
@@ -77,7 +79,8 @@ def filter_player(tracking_results, num_frames):
         feeder = stick_record[st['id']][0]
         id = 1
         dist_sum = 0
-        prev_pos = (tracking_results[feeder]['bbox'][0][0], tracking_results[feeder]['bbox'][0][1])
+        prev_pos = (tracking_results[feeder]['bbox'][0]
+                    [0], tracking_results[feeder]['bbox'][0][1])
         feeder_i = 0
         prev_vallid = 0
         for i in range(num_frames):
@@ -92,27 +95,31 @@ def filter_player(tracking_results, num_frames):
                     bb[i][k] = tracking_results[feeder]['bbox'][feeder_i][k]
                 prev_vallid = i
                 feeder_i += 1
-            else: 
+            else:
                 d = i - prev_vallid
                 e = tracking_results[feeder]['frames'][feeder_i] - prev_vallid
                 for k in range(4):
-                    bb[i][k] = bb[prev_vallid][k] + (tracking_results[feeder]['bbox'][feeder_i][k] - bb[prev_vallid][k]) * d / e
+                    bb[i][k] = bb[prev_vallid][k] + \
+                        (tracking_results[feeder]['bbox'][feeder_i]
+                         [k] - bb[prev_vallid][k]) * d / e
             if feeder_i == len(tracking_results[feeder]['frames']) and id < len(stick_record[st['id']]):
                 feeder_i = 0
                 feeder = stick_record[st['id']][id]
                 id += 1
             dist_sum += get_dist(prev_pos, (bb[i][0], bb[i][1]))
             prev_pos = (bb[i][0], bb[i][1])
-        my_track[st['id']] = {'bbox': bb, 'frames':np.arange(num_frames, dtype=int)}
+        my_track[st['id']] = {'bbox': bb,
+                              'frames': np.arange(num_frames, dtype=int)}
         travel_distance.append((dist_sum, st['id']))
-    
-    travel_distance = sorted(travel_distance, key=lambda x : x[0])
-    
+
+    travel_distance = sorted(travel_distance, key=lambda x: x[0])
+
     new_track = {}
     new_track[0] = my_track[travel_distance[-1][1]]
     new_track[1] = my_track[travel_distance[-2][1]]
 
     return new_track
+
 
 def VIBE(vid_path, image_folder='data/frame/'):
     device = torch.device(
@@ -123,9 +130,9 @@ def VIBE(vid_path, image_folder='data/frame/'):
 
     mot = MPT(device=device, detection_threshold=0.5, output_format='dict')
     tracking_results = mot('data/frame')  # sorted with first frame
-
+    del mot
     tracking_results = filter_player(tracking_results, num_frames)
-    
+
     # fr.rewind()
     # out = cv2.VideoWriter('mytracker.mp4',cv2.VideoWriter_fourcc(*'mp4v'), 30, (orig_width, orig_height))
     # for i in range(num_frames):
@@ -138,7 +145,6 @@ def VIBE(vid_path, image_folder='data/frame/'):
     #         )
     #     out.write(img)
     # out.release()
-
 
     model = VIBE_Demo(
         seqlen=num_frames,

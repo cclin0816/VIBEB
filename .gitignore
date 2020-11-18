@@ -4,3 +4,4 @@ __pycache__
 .vscode
 model
 install_dep.sh
+*.mp4

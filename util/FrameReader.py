@@ -71,5 +71,7 @@ class FR:
         if self.__vid.isOpened():
             self.__vid.release()
 
-    def read_frame(self):
+    def read_frame(self, frame_number=-1):
+        if frame_number != -1:
+            self.__vid.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
         return self.__vid.read()
