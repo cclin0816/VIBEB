@@ -19,11 +19,18 @@ class TrackNet():
 
     def __pre_process(self, data):
         data_size = data.shape[0]
-        if data_size % 3 != 0:
+        padd_size = 0
+        if data_size < 3:
+            data = np.append(data, [data[-1]], 0)
+            if data_size < 2:
+                data = np.append(data, [data[-1]], 0)
+            padd_size = 3 - data_size
+        elif data_size % 3 != 0:
             data = np.append(data[:data_size - (data_size % 3)], data[-3:], 0)
+            padd_size = (3 - (data_size % 3)) % 3
         data = ((np.reshape(
             data, (-1, 9, data.shape[2], data.shape[3]))).astype('float32')) / 255.0
-        return data, (3 - (data_size % 3)) % 3
+        return data, padd_size
 
     def __post_process(self, pred, pad_size):
         pred = np.reshape(

@@ -12,7 +12,7 @@ import numpy as np
 import sys
 my_stdout = sys.stdout
 sys.stdout = open("/dev/null", "w")
-
+import cv2
 
 def Run_TrackNet(pipe, vid_path):
     try:
@@ -115,6 +115,8 @@ def main():
         p.join()
         if(render_fin is "breakdown"):
             raise breakdown
+        
+        print("finish", file=my_stdout)
 
     except:
         print("breakdown", file=my_stdout)

@@ -183,7 +183,7 @@ def smoothing(traj):
             valid = True
     st_ball = -1
     for i in range(num_frame - 3):
-        if np.sum(stable[i:i + 4]) == 4 and np.sum(delta[i:i + 3]) > 40:
+        if np.sum(stable[i:i + 4]) == 4 and np.sum(delta[i:i + 3]) > 15:
             st_ball = i
             break
 
